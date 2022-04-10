@@ -1,9 +1,9 @@
 const Discord = require('discord.js');
-const ayarlar = require('../ayarlar.json')
+const config = require('../config.json')
 
 exports.run = async (client, message, args) => {
 let guild = message.guild.id;   
-var prefix = ayarlar.prefix;
+var prefix = config.prefix;
 
   if (!message.member.hasPermission("BAN_MEMBERS")) return message.channel.send(`Bu komutu kullanabilmek için **Üyeleri Yasakla** iznine sahip olmalısın!`);
   

@@ -37,9 +37,9 @@ Glitch kullanıyorsanız basit kurulum yolu;
 başarılı! 
 
 2 • Eğer hatanız;
-`ayarlar is not defined:`
+`config is not defined:`
 şeklindeyse hatayı aldığınız komutun en üstüne alttaki kodu girmeniz gerekli:
-`const ayarlar = require('../ayarlar.json')`
+`const config = require('../config.json')`
  yazın, sorun çözülecektir.
  
 

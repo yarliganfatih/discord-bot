@@ -1,11 +1,11 @@
 const Discord = require('discord.js');
 const client = new Discord.Client({ disableMentions: 'everyone' });
-const ayarlar = require('./ayarlar.json');
+const config = require('./config.json');
 const fs = require('fs');
 const moment = require('moment');
 require('./util/eventLoader')(client);
 
-var prefix = ayarlar.prefix;
+var prefix = config.prefix;
 
 const log = message => {
   console.log(`[${moment().format('YYYY-MM-DD HH:mm:ss')}] ${message}`);
@@ -13,11 +13,11 @@ const log = message => {
 
 client.commands = new Discord.Collection();
 client.aliases = new Discord.Collection();
-fs.readdir("./komutlar/", (err, files) => {
+fs.readdir("./commands/", (err, files) => {
   if (err) console.error(err);
   log(`${files.length} komut yüklenecek.`);
   files.forEach(f => {
-    let props = require(`./komutlar/${f}`);
+    let props = require(`./commands/${f}`);
     log(`Yüklenen komut: ${props.help.name}.`);
     client.commands.set(props.help.name, props);
     props.conf.aliases.forEach(alias => {
@@ -28,8 +28,8 @@ fs.readdir("./komutlar/", (err, files) => {
 client.reload = command => {
   return new Promise((resolve, reject) => {
     try {
-      delete require.cache[require.resolve(`./komutlar/${command}`)];
-      let cmd = require(`./komutlar/${command}`);
+      delete require.cache[require.resolve(`./commands/${command}`)];
+      let cmd = require(`./commands/${command}`);
       client.commands.delete(command);
       client.aliases.forEach((cmd, alias) => {
         if (cmd === command) client.aliases.delete(alias);
@@ -47,7 +47,7 @@ client.reload = command => {
 client.load = command => {
   return new Promise((resolve, reject) => {
     try {
-      let cmd = require(`./komutlar/${command}`);
+      let cmd = require(`./commands/${command}`);
       client.commands.set(command, cmd);
       cmd.conf.aliases.forEach(alias => {
         client.aliases.set(alias, cmd.help.name);
@@ -61,8 +61,8 @@ client.load = command => {
 client.unload = command => {
   return new Promise((resolve, reject) => {
     try {
-      delete require.cache[require.resolve(`./komutlar/${command}`)];
-      let cmd = require(`./komutlar/${command}`);
+      delete require.cache[require.resolve(`./commands/${command}`)];
+      let cmd = require(`./commands/${command}`);
       client.commands.delete(command);
       client.aliases.forEach((cmd, alias) => {
         if (cmd === command) client.aliases.delete(alias);
@@ -77,28 +77,28 @@ client.unload = command => {
 client.on('ready', () => {
 
   // Oynuyor Kısmı
-  
-      var actvs = [
-        `${prefix}yardım ${client.guilds.cache.size} sunucuyu`,
-        `${prefix}yardım ${client.users.cache.size} Kullanıcıyı`, 
-        `${prefix}yardım`
-    ];
-    
+
+  var actvs = [
+    `${prefix}yardım ${client.guilds.cache.size} sunucuyu`,
+    `${prefix}yardım ${client.users.cache.size} Kullanıcıyı`,
+    `${prefix}yardım`
+  ];
+
+  client.user.setActivity(actvs[Math.floor(Math.random() * (actvs.length - 1) + 1)], { type: 'LISTENING' });
+  setInterval(() => {
     client.user.setActivity(actvs[Math.floor(Math.random() * (actvs.length - 1) + 1)], { type: 'LISTENING' });
-    setInterval(() => {
-        client.user.setActivity(actvs[Math.floor(Math.random() * (actvs.length - 1) + 1)], { type: 'LISTENING'});
-    }, 15000);
-    
-  
-      console.log ('_________________________________________');
-      console.log (`Kullanıcı İsmi     : ${client.user.username}`);
-      console.log (`Sunucular          : ${client.guilds.cache.size}`);
-      console.log (`Kullanıcılar       : ${client.users.cache.size}`);
-      console.log (`Prefix             : ${ayarlar.prefix}`);
-      console.log (`Durum              : Bot Çevrimiçi!`);
-      console.log ('_________________________________________');
-    
-    });
+  }, 15000);
+
+
+  console.log('_________________________________________');
+  console.log(`Kullanıcı İsmi     : ${client.user.username}`);
+  console.log(`Sunucular          : ${client.guilds.cache.size}`);
+  console.log(`Kullanıcılar       : ${client.users.cache.size}`);
+  console.log(`Prefix             : ${config.prefix}`);
+  console.log(`Durum              : Bot Çevrimiçi!`);
+  console.log('_________________________________________');
+
+});
 
 
 client.elevation = message => {
@@ -108,8 +108,8 @@ client.elevation = message => {
   let permlvl = 0;
   if (message.member.hasPermission("BAN_MEMBERS")) permlvl = 2;
   if (message.member.hasPermission("ADMINISTRATOR")) permlvl = 3;
-  if (message.author.id === ayarlar.sahip) permlvl = 4;
+  if (message.author.id === config.sahip) permlvl = 4;
   return permlvl;
 };
 
-client.login(ayarlar.token);
+client.login(config.token);
